@@ -21,11 +21,10 @@ public class BFS {
         g.connectVertices("3", "7", 1);
         g.connectVertices("4", "7", 1);
         g.connectVertices("4", "8", 1);
-        bfs(g, g.getVertex("1"));
+        bfs(g.getVertex("1"));
     }
 
-    public static void bfs(OopGraph g, Vertex start) {
-        Iterable<Vertex> vertices = g.vertices();
+    public static void bfs(Vertex start) {
         Queue<Vertex> frontier = new LinkedList<>();
         Set<Vertex> vis = new HashSet<>();
         frontier.add(start);
