@@ -22,12 +22,18 @@ public class BFS {
         g.connectVertices("4", "7", 1);
         g.connectVertices("4", "8", 1);
         bfs(g.getVertex("1"));
-        Map<Vertex, Integer> layer = bfs_Layer_Pred(g.getVertex("1"));
-        for(Vertex v : layer.keySet()) {
-            System.out.println(v.label() + " " + layer.get(v));
+        Map<Vertex, PathInfo> paths = bfs_Layer_Pred(g.getVertex("1"));
+        for(Vertex v : paths.keySet()) {
+            if(paths.get(v).pred == null) {
+                System.out.println(v.label() + " " + paths.get(v).layer + " null");
+            }
+            else {
+                System.out.println(v.label() + " " + paths.get(v).layer + " " + paths.get(v).pred.label());
+            }
         }
-        for(Vertex v : pred.keySet()) {
-            System.out.println(v.label() + " " + pred.get(v));
+        List<Vertex> path = pathTo(paths, g.getVertex("8"));
+        for(Vertex v : path) {
+            System.out.println(v.label());
         }
     }
 
@@ -47,15 +53,13 @@ public class BFS {
         }
     }
 
-    public static Map<Vertex, String> pred = new LinkedHashMap<>();
-    public static Map<Vertex, Integer> bfs_Layer_Pred(Vertex start) { //what about predecessors
-        Map<Vertex, Integer> layer = new LinkedHashMap<>();
+    public static Map<Vertex, PathInfo> bfs_Layer_Pred(Vertex start) {
+        Map<Vertex, PathInfo> pathInfo = new LinkedHashMap<>();
 
         Queue<Vertex> frontier = new LinkedList<>();
         Set<Vertex> vis = new HashSet<>();
         frontier.add(start);
-        layer.put(start, 0);
-        pred.put(start, null);
+        pathInfo.put(start, new PathInfo(0, null));
         while(!frontier.isEmpty()) {
             Vertex v = frontier.remove();
             System.out.println(v.label());
@@ -63,11 +67,34 @@ public class BFS {
                 if(!vis.contains(e.destination())) {
                     frontier.add(e.destination());
                     vis.add(e.destination());
-                    layer.put(e.destination(), layer.get(v)+1);
-                    pred.put(e.destination(), v.label());
+                    pathInfo.put(e.destination(), new PathInfo(pathInfo.get(v).layer+1, v));
                 }
             }
         }
-        return layer;
+        return pathInfo;
+    }
+
+    static class PathInfo {
+        int layer;
+        Vertex pred;
+
+        public PathInfo(int layer, Vertex pred) {
+            this.layer = layer;
+            this.pred = pred;
+        }
+
+        public String toString() {
+            return "{layer=" + layer + ", pred=" + pred + "}";
+        }
+    }
+
+    static List<Vertex> pathTo(Map<Vertex, PathInfo> pathInfo, Vertex end) {
+        List<Vertex> path = new ArrayList<>();
+        Vertex v = end;
+        while(v != null) {
+            path.add(0, v);
+            v = pathInfo.get(v).pred;
+        }
+        return path;
     }
 }
